@@ -1,0 +1,219 @@
+* {
+  box-sizing: border-box;
+  font-family: "JetBrains Mono", monospace;
+}
+
+button {
+  cursor: pointer;
+}
+
+.gestion_box {
+  position: relative;
+  cursor: pointer;
+  color: #000;
+}
+
+.gestion_box:hover .dropdown_box {
+  display: flex;
+}
+
+.gestion_box .dropdown_box {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  width: 100px;
+  left: -70px;
+  bottom: -40px;
+}
+.btn_edit,
+.btn_delete {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  font-size: .6em;
+  color: #9a9999;
+  transition: all 0.3s;
+}
+
+.btn_edit svg,
+.btn_delete svg{
+  width: 14px;
+}
+
+.btn_edit:hover,
+.btn_delete:hover {
+  color: #000;
+}
+/*MODAL*/
+.light-box {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  z-index: 10000;
+}
+
+.light-box .overlay {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.light-box.active {
+  visibility: visible;
+}
+
+.light-box .modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  width: 500px;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.light-box .modal .close_modal {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 100%;
+  top: -10px;
+  right: 0;
+}
+
+.light-box .modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.light-box .modal form input,
+.light-box .modal form select {
+  width: 100%;
+  border: 2px solid #9a9999;
+  background-color: #fff;
+  color: #000;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.light-box .modal form button {
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 5px 2px 0px rgba(0, 0, 0, 0.76);
+  transition: all 0.3s;
+}
+
+.light-box .modal form button:hover {
+  box-shadow: none;
+  transform: translateY(5px);
+}
+
+body {
+  min-width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-size: 18px;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+
+.container {
+  padding: 20px;
+}
+
+.container .header {
+  padding-bottom: 10px;
+  border-bottom: 2px solid #9a9999;
+}
+
+.container .header .logo {
+  font-size: 1.2em;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.container .sub_header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 40px 0;
+}
+
+.container .sub_header .search_bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 60%;
+}
+
+.container .sub_header .search_bar .search_box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  padding: 5px 10px;
+  border: 2px solid #9a9999;
+  border-radius: 5px;
+}
+
+.container .sub_header .search_bar .filter {
+  display: flex;
+  align-items: center;
+}
+
+.container .sub_header .search_bar .search_box .search_icon {
+  width: 10%;
+  transform: translateY(2px);
+}
+
+.container .sub_header .search_bar .search_box input {
+  border: none;
+  outline: none;
+  width: 90%;
+}
+
+.container .sub_header .search_bar .select_box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.container .sub_header .search_bar .select_box label {
+  font-size: 0.8em;
+}
+
+.container .main table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.container .main table thead tr th {
+  text-align: left;
+  color: #9a9999;
+  border-bottom: 2px solid #9a9999;
+  padding-bottom: 10px;
+}
+
+.container .main table tbody tr td {
+  padding: 15px 0;
+}
+
+.container .main table tbody tr td:last-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

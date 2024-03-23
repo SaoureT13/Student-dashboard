@@ -110,29 +110,3 @@ function studentsReducer(students, action) {
     }
   }
 }
-
-const fetchData = async () => {
-  try {
-    const response = await axios.get("http://localhost:8000/students/", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
-// const initialize_data = fetchData();
-// // fetchData()
-// console.log(initialize_data)
-let h = [];
-const initializeData = async () => {
-  const data = await fetchData();
-  h = data;
-  return data;
-};
-
-initializeData();
-console.log(h);

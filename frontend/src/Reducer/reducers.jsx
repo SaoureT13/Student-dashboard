@@ -19,6 +19,7 @@ export function StudentsProvider({ children }) {
   const [batchs, setBatchs] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState([]);
 
+  //Je me demandais si je ne devrais recuperer les données simplement et inialisé mon reducer avec au lieu de faire ça
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -84,11 +85,17 @@ function studentsReducer(students, action) {
       return { ...students, student: null };
     }
     case "UPDATE_STUDENT_SUCCESS": {
-      const updatedStudents = students.map((student) =>
-        student.id === action.student_id ? action.student : student
-      );
+      // const updatedStudents = students.map((student) =>
+      //   student.id === action.student_id ? action.student : student
+      // );
 
-      return updatedStudents;
+      // return updatedStudents;
+      return {
+        ...students,
+        students: students.map((student) =>
+          student.id === action.student_id ? action.student : student
+        ),
+      };
     }
 
     case "DELETE_STUDENT_SUCCESS": {
@@ -103,3 +110,29 @@ function studentsReducer(students, action) {
     }
   }
 }
+
+const fetchData = async () => {
+  try {
+    const response = await axios.get("http://localhost:8000/students/", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+// const initialize_data = fetchData();
+// // fetchData()
+// console.log(initialize_data)
+let h = [];
+const initializeData = async () => {
+  const data = await fetchData();
+  h = data;
+  return data;
+};
+
+initializeData();
+console.log(h);

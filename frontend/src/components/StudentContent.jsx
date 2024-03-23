@@ -13,17 +13,20 @@ export function StudentContent({
   selectedPaymentStatus,
 }) {
   const students = useStudents();
-  const [studentsFiltered, setStudentsFiltered] = useState(students);
+  //ICI, ça ne fonctionne pas parce que lors du rendu students est un tableau vide
+  /*const [studentsFiltered, setStudentsFiltered] = useState(students);
 
-  
+  useEffect(() => {
+    setStudentsFiltered(students);
+  }, [students]);
+
   useEffect(() => {
     if (!isNaN(selectedBatch) || !isNaN(selectedPaymentStatus)) {
       setStudentsFiltered(
         students.filter((student) => {
           if (
             (!isNaN(selectedBatch) && student.batch == selectedBatch) &&
-            (!isNaN(selectedPaymentStatus) &&
-              student.payment_status == selectedPaymentStatus)
+            (!isNaN(selectedPaymentStatus) && student.payment_status == selectedPaymentStatus)
           ) {
             return true;
           } else {
@@ -31,8 +34,8 @@ export function StudentContent({
           }
         })
       );
-    }
-  }, [selectedBatch, selectedPaymentStatus, students]);
+    } 
+  }, [selectedBatch, selectedPaymentStatus, students]);*/
 
   const dispatch = useStudentsDispatch();
 
@@ -64,83 +67,44 @@ export function StudentContent({
           </tr>
         </thead>
         <tbody>
-          {studentsFiltered.length === 0
-            ? students.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.name}</td>
-                  <td>{student.email}</td>
-                  <td>{student.phone_number}</td>
-                  <td>{student.course}</td>
-                  <td>
-                    Batch{" "}
-                    {student.batch == 1 ? "A" : student.batch == 2 ? "B" : "C"}
-                  </td>
-                  <td
-                    style={{
-                      color: student.payment_status == 1 ? "orange" : "green",
-                    }}
-                  >
-                    {student.payment_status == 1 ? "Pending" : "Completed"}
-                    <div className="gestion_box">
-                      <EllipsisVertical />
-                      <div className="dropdown_box">
-                        <button
-                          className="btn_edit"
-                          onClick={() => {
-                            onClick(), updateCurrentStudent(student);
-                          }}
-                        >
-                          <Pencil /> Edit
-                        </button>
-                        <button
-                          className="btn_delete"
-                          onClick={() => handleDeleteStudent(student.id)}
-                        >
-                          <Trash2 /> Delete
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            : studentsFiltered.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.name}</td>
-                  <td>{student.email}</td>
-                  <td>{student.phone_number}</td>
-                  <td>{student.course}</td>
-                  <td>
-                    Batch{" "}
-                    {student.batch == 1 ? "A" : student.batch == 2 ? "B" : "C"}
-                  </td>
-                  <td
-                    style={{
-                      color: student.payment_status == 1 ? "orange" : "green",
-                    }}
-                  >
-                    {student.payment_status == 1 ? "Pending" : "Completed"}
-                    <div className="gestion_box">
-                      <EllipsisVertical />
-                      <div className="dropdown_box">
-                        <button
-                          className="btn_edit"
-                          onClick={() => {
-                            onClick(), updateCurrentStudent(student);
-                          }}
-                        >
-                          <Pencil /> Edit
-                        </button>
-                        <button
-                          className="btn_delete"
-                          onClick={() => handleDeleteStudent(student.id)}
-                        >
-                          <Trash2 /> Delete
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+          {students.map((student) => (
+            <tr key={student.id}>
+              <td>{student.name}</td>
+              <td>{student.email}</td>
+              <td>{student.phone_number}</td>
+              <td>{student.course}</td>
+              <td>
+                Batch{" "}
+                {student.batch == 1 ? "A" : student.batch == 2 ? "B" : "C"}
+              </td>
+              <td
+                style={{
+                  color: student.payment_status == 1 ? "orange" : "green",
+                }}
+              >
+                {student.payment_status == 1 ? "Pending" : "Completed"}
+                <div className="gestion_box">
+                  <EllipsisVertical />
+                  <div className="dropdown_box">
+                    <button
+                      className="btn_edit"
+                      onClick={() => {
+                        onClick(), updateCurrentStudent(student);
+                      }}
+                    >
+                      <Pencil /> Edit
+                    </button>
+                    <button
+                      className="btn_delete"
+                      onClick={() => handleDeleteStudent(student.id)}
+                    >
+                      <Trash2 /> Delete
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </main>

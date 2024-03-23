@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useRef,
   useState,
 } from "react";
 
@@ -13,16 +14,21 @@ export const CurrentStudentContext = createContext(null);
 export const BatchsContextPaymentStatusContext = createContext(null);
 
 export function StudentsProvider({ children }) {
+  // const [isLoadingStudents, setIsLoadingStudents] = useState(false)
   const [students, dispatch] = useReducer(studentsReducer, []);
   const [currentStudent, setCurrentStudent] = useState(null);
 
+  const isComponentMounted = useRef(false)
+
   const [batchs, setBatchs] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState([]);
+
 
   //Je me demandais si je ne devrais recuperer les données simplement et inialisé mon reducer avec au lieu de faire ça
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // setIsLoadingStudents(true);
         const response = await axios.get("http://localhost:8000/students/");
         const studentData = response.data;
         dispatch({ type: "INITIALIZE_DATA", students: studentData });
@@ -31,8 +37,11 @@ export function StudentsProvider({ children }) {
       }
     };
 
-    fetchData();
-  }, [students]);
+    if (!isComponentMounted.current) {
+      fetchData();
+      isComponentMounted.current = true
+    }
+  }, [])
 
   useEffect(() => {
     const fetchData = async (url, setter) => {
@@ -85,22 +94,15 @@ function studentsReducer(students, action) {
       return { ...students, student: null };
     }
     case "UPDATE_STUDENT_SUCCESS": {
-      // const updatedStudents = students.map((student) =>
-      //   student.id === action.student_id ? action.student : student
-      // );
-
-      // return updatedStudents;
-      return {
-        ...students,
-        students: students.map((student) =>
-          student.id === action.student_id ? action.student : student
-        ),
-      };
+      const updatedStudents = students.map((student) =>
+        student.id === action.student_id ? action.student : student
+      );
+      return updatedStudents;
     }
 
     case "DELETE_STUDENT_SUCCESS": {
       const updatedStudents = students.filter(
-        (student) => student.id !== student
+        (student) => student.id !== action.student_id
       );
       return updatedStudents;
     }

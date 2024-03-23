@@ -33,7 +33,7 @@ export const update_student = (dispatch) => async (studentData, studentId) => {
       }
     );
     dispatch({
-      type: "UPDATE_STUDENT_SUCCES",
+      type: "UPDATE_STUDENT_SUCCESS",
       student: response.data,
       student_id: studentId,
     });

@@ -13,13 +13,14 @@ export function StudentContent({
   selectedPaymentStatus,
 }) {
   const students = useStudents();
-  //ICI, ça ne fonctionne pas parce que lors du rendu students est un tableau vide
-  /*const [studentsFiltered, setStudentsFiltered] = useState(students);
+  //ICI, ça ne fonctionne pas parce que lors du premier rendu students est un tableau vide
+  /*
+  const [studentsFiltered, setStudentsFiltered] = useState(students);
 
   useEffect(() => {
     setStudentsFiltered(students);
   }, [students]);
-
+  
   useEffect(() => {
     if (!isNaN(selectedBatch) || !isNaN(selectedPaymentStatus)) {
       setStudentsFiltered(

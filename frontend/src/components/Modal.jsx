@@ -1,75 +1,67 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { CircleX } from "lucide-react";
 import { add_student, update_student } from "../Reducer/actions";
 import {
   BatchsContextPaymentStatusContext,
   CurrentStudentContext,
   useStudentsDispatch,
-  useToast,
+  // useToast,
 } from "../Reducer/reducers";
 
+const schema = yup
+  .object({
+    name: yup.string().required(),
+    email: yup.string().email().required(),
+    phone_number: yup
+      .string()
+      .required()
+      .min(10, "Phone number must be have 10 numbers"),
+    course: yup.string().required(),
+    batch: yup.number().required(),
+    payment_status: yup.number().required(),
+  })
+  .required();
+
 export function ModalAdd({ active, onClick }) {
-  //Utiliser le hook form 
-  
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitted, isSubmitting, isSubmitSuccessful },
+  } = useForm({ resolver: yupResolver(schema) });
+
+  // console.log(isSubmitSuccessful, isSubmitted, errors);
+
   const dispatch = useStudentsDispatch();
   const { currentStudent } = useContext(CurrentStudentContext);
 
   const { batchs, paymentStatus } = useContext(
     BatchsContextPaymentStatusContext
   );
-  const { pushToast } = useToast();
+  // const { pushToast } = useToast();
 
   useEffect(() => {
     if (currentStudent) {
-      setFormData({
-        name: currentStudent.name,
-        email: currentStudent.email,
-        phone_number: currentStudent.phone_number,
-        course: currentStudent.course,
-        batch: currentStudent.batch,
-        payment_status: currentStudent.payment_status,
-      });
+      reset(currentStudent);
     }
-  }, [currentStudent]);
+    if (isSubmitSuccessful && !currentStudent) {
+      reset();
+    }
+  }, [reset, currentStudent, isSubmitSuccessful]);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone_number: "",
-    course: "",
-    batch: "",
-    payment_status: "",
-  });
-
-  const onChange = (e) => {
-    const value =
-      e.target.name === "batch" || e.target.name === "payment_status"
-        ? parseInt(e.target.value)
-        : e.target.value;
-    setFormData({ ...formData, [e.target.name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setFormData({
-      name: "",
-      email: "",
-      phone_number: "",
-      course: "",
-      batch: "",
-      payment_status: "",
-    });
-
-    onClick();
-    // pushToast({ title: "Student succefully added" });
+  const onSubmit = async (data) => {
+    // console.log(data);
 
     try {
       if (currentStudent) {
-        await update_student(dispatch)(formData, currentStudent.id);
+        await update_student(dispatch)(data, currentStudent.id);
+        onClick()
       } else {
-        await add_student(dispatch)(formData);
+        await add_student(dispatch)(data);
       }
     } catch (error) {
       console.error(error);
@@ -91,49 +83,30 @@ export function ModalAdd({ active, onClick }) {
         >
           <CircleX />
         </span>
-        <form onSubmit={(e) => handleSubmit(e)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <input
             type="text"
-            name="name"
             placeholder="Student name..."
             autoComplete="off"
-            required
-            value={formData.name}
-            onChange={(e) => onChange(e)}
+            {...register("name")}
           />
           <input
-            type="text"
-            name="email"
+            type="email"
             placeholder="Student email..."
-            autoComplete="no-email"
-            required
-            value={formData.email}
-            onChange={(e) => onChange(e)}
+            {...register("email")}
           />
           <input
             type="text"
-            name="phone_number"
             placeholder="Student phone number..."
-            autoComplete="no-number"
-            required
-            value={formData.phone_number}
-            onChange={(e) => onChange(e)}
+            {...register("phone_number")}
           />
+          {errors.phone_number && <span>{errors.phone_number?.message}</span>}
           <input
             type="text"
-            name="course"
             placeholder="Student course..."
-            autoComplete="off"
-            required
-            value={formData.course}
-            onChange={(e) => onChange(e)}
+            {...register("course")}
           />
-          <select
-            name="batch"
-            required
-            value={formData.batch}
-            onChange={(e) => onChange(e)}
-          >
+          <select {...register("batch")}>
             <option value="">Select Batch</option>
             {batchs.map((batch) => (
               <option key={batch.id} value={batch.id}>
@@ -141,12 +114,7 @@ export function ModalAdd({ active, onClick }) {
               </option>
             ))}
           </select>
-          <select
-            name="payment_status"
-            required
-            value={formData.payment_status}
-            onChange={(e) => onChange(e)}
-          >
+          <select {...register("payment_status")}>
             <option value="">Select Payment Status</option>
             {paymentStatus.map((p) => (
               <option key={p.id} value={p.id}>
@@ -154,7 +122,9 @@ export function ModalAdd({ active, onClick }) {
               </option>
             ))}
           </select>
-          <button type="submit">Add</button>
+          <button type="submit" disabled={isSubmitting}>
+            Add
+          </button>
         </form>
       </div>
     </div>,

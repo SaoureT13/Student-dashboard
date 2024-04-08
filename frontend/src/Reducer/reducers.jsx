@@ -1,34 +1,41 @@
 import axios from "axios";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useReducer,
   useRef,
   useState,
 } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Toast } from "../components/Toast";
 
 const StudentsContext = createContext(null);
 const StudentsDispatchContext = createContext(null);
 export const CurrentStudentContext = createContext(null);
 export const BatchsContextPaymentStatusContext = createContext(null);
 
+const defaultPush = (toast) => {};
+
+const ToastContext = createContext({
+  pushToastRef: { current: defaultPush },
+});
+
 export function StudentsProvider({ children }) {
-  // const [isLoadingStudents, setIsLoadingStudents] = useState(false)
   const [students, dispatch] = useReducer(studentsReducer, []);
   const [currentStudent, setCurrentStudent] = useState(null);
-
-  const isComponentMounted = useRef(false)
 
   const [batchs, setBatchs] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState([]);
 
+  const isComponentMounted = useRef(false);
 
-  //Je me demandais si je ne devrais recuperer les données simplement et inialisé mon reducer avec au lieu de faire ça
+  const pushToastRef = useRef(defaultPush);
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDataStudents = async () => {
       try {
-        // setIsLoadingStudents(true);
         const response = await axios.get("http://localhost:8000/students/");
         const studentData = response.data;
         dispatch({ type: "INITIALIZE_DATA", students: studentData });
@@ -37,13 +44,6 @@ export function StudentsProvider({ children }) {
       }
     };
 
-    if (!isComponentMounted.current) {
-      fetchData();
-      isComponentMounted.current = true
-    }
-  }, [])
-
-  useEffect(() => {
     const fetchData = async (url, setter) => {
       try {
         const response = await axios.get(url);
@@ -53,8 +53,12 @@ export function StudentsProvider({ children }) {
       }
     };
 
-    fetchData("http://localhost:8000/batchs/", setBatchs);
-    fetchData("http://localhost:8000/paymentStatus/", setPaymentStatus);
+    if (!isComponentMounted.current) {
+      fetchDataStudents();
+      fetchData("http://localhost:8000/batchs/", setBatchs);
+      fetchData("http://localhost:8000/paymentStatus/", setPaymentStatus);
+      isComponentMounted.current = true;
+    }
   }, []);
 
   return (
@@ -66,7 +70,10 @@ export function StudentsProvider({ children }) {
           <BatchsContextPaymentStatusContext.Provider
             value={{ batchs, paymentStatus }}
           >
-            {children}
+            <ToastContext.Provider value={{ pushToastRef }}>
+              <Toasts/>
+              {children}
+            </ToastContext.Provider>
           </BatchsContextPaymentStatusContext.Provider>
         </CurrentStudentContext.Provider>
       </StudentsDispatchContext.Provider>
@@ -111,4 +118,56 @@ function studentsReducer(students, action) {
       return students;
     }
   }
+}
+
+export function Toasts() {
+  const [toasts, setToasts] = useState([]);
+  const { pushToastRef } = useContext(ToastContext);
+
+  pushToastRef.current = ({ ...props }) => {
+    const id = Date.now();
+
+    const timer = setTimeout(() => {
+      setToasts((v) => v.filter((t) => t.id !== id));
+    }, 5 * 1000);
+
+    const toast = { ...props, id, timer };
+    setToasts((v) => [...v, toast]);
+  };
+
+  const onRemove = (toast) => {
+    clearTimeout(toast.timer);
+    setToasts((v) => v.filter((t) => t !== toast));
+  };
+
+  return (
+    <div className="toast_container">
+      <AnimatePresence>
+        {toasts.map((toast) => (
+          <motion.div
+            key={toast.id}
+            onClick={() => onRemove(toast)}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opactity: 0, x: 30 }}
+          >
+            <Toast {...toast} />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export function useToast() {
+  const { pushToastRef } = useContext(ToastContext);
+
+  return {
+    pushToast: useCallback(
+      (toast) => {
+        pushToastRef.current(toast);
+      },
+      [pushToastRef]
+    ),
+  };
 }

@@ -6,18 +6,22 @@ import {
   BatchsContextPaymentStatusContext,
   CurrentStudentContext,
   useStudentsDispatch,
+  useToast,
 } from "../Reducer/reducers";
 
 export function ModalAdd({ active, onClick }) {
+  //Utiliser le hook form 
+  
   const dispatch = useStudentsDispatch();
-  const { currentStudent } = useContext(
-    CurrentStudentContext
-  );
+  const { currentStudent } = useContext(CurrentStudentContext);
 
-  const { batchs, paymentStatus} = useContext(BatchsContextPaymentStatusContext)
+  const { batchs, paymentStatus } = useContext(
+    BatchsContextPaymentStatusContext
+  );
+  const { pushToast } = useToast();
 
   useEffect(() => {
-    if(currentStudent){
+    if (currentStudent) {
       setFormData({
         name: currentStudent.name,
         email: currentStudent.email,
@@ -58,19 +62,20 @@ export function ModalAdd({ active, onClick }) {
       payment_status: "",
     });
 
-    onClick()
+    onClick();
+    // pushToast({ title: "Student succefully added" });
 
     try {
-      if(currentStudent){
+      if (currentStudent) {
         await update_student(dispatch)(formData, currentStudent.id);
-      }else{
+      } else {
         await add_student(dispatch)(formData);
       }
     } catch (error) {
       console.error(error);
     }
   };
-  
+
   return createPortal(
     <div className={`light-box ${active}`}>
       <div

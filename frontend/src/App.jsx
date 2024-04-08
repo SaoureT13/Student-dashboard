@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./App.css";
+import "./styles/App.css";
 import { Addnew } from "./components/Addnew";
 import Header from "./components/Header";
 import { SearchBar } from "./components/SearchBar";
@@ -9,8 +9,10 @@ import { ModalAdd } from "./components/Modal";
 function App() {
   const [active, setActive] = useState("");
 
-  const [selectedBatch, setSelectedBatch] = useState(null);
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(null);
+  const [selectedBatch, setSelectedBatch] = useState(0);
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(0);
+
+  const [search, setSearch] = useState("");
 
   const handleBatchFilter = (event) => {
     setSelectedBatch(event.target.value);
@@ -31,6 +33,8 @@ function App() {
         <SearchBar
           handlePaymentStatusFilter={handlePaymentStatusFilter}
           handleBatchFilter={handleBatchFilter}
+          handleSearch={setSearch}
+          value={search}
         />
         <Addnew onClick={handleModal} />
       </div>
@@ -39,6 +43,7 @@ function App() {
         active={active}
         selectedBatch={selectedBatch}
         selectedPaymentStatus={selectedPaymentStatus}
+        valueSearch={search}
       />
       {active == "active" && <ModalAdd active={active} onClick={handleModal} />}
     </div>

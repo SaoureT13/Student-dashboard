@@ -2,7 +2,7 @@ import { Search, ListFilter } from "lucide-react";
 import { useContext } from "react";
 import { BatchsContextPaymentStatusContext } from "../Reducer/reducers";
 
-function Input({ value, onChange }) {
+function Input({ value, handleSearch }) {
   return (
     <div className="search_box">
       <div className="search_icon">
@@ -12,7 +12,7 @@ function Input({ value, onChange }) {
         type="text"
         placeholder="Search by name, email, or phone"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleSearch(e.target.value)}
       />
     </div>
   );
@@ -25,7 +25,7 @@ function Select({ name, datas, onChange }) {
     <div className="select_box">
       <label htmlFor={selectId}>{name}:</label>
       <select name={name} id={selectId} onChange={onChange}>
-        <option value="">All</option>
+        <option value="0">All</option>
         {datas.map((data) => (
           <option key={data.id} value={data.id}>
             {data.name ? data.name : data.status}
@@ -36,13 +36,13 @@ function Select({ name, datas, onChange }) {
   );
 }
 
-export function SearchBar({ handleBatchFilter, handlePaymentStatusFilter }) {
+export function SearchBar({ handleBatchFilter, handlePaymentStatusFilter, handleSearch, value }) {
   const { batchs, paymentStatus } = useContext(
     BatchsContextPaymentStatusContext
   );
   return (
     <div className="search_bar">
-      <Input />
+      <Input handleSearch={handleSearch} value={value}/>
       <div className="filter">
         <ListFilter />
         <p>Filter</p>
